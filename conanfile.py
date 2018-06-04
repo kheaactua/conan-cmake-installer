@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 from conans import ConanFile, tools, AutoToolsBuildEnvironment
 from conans.errors import ConanException
 
