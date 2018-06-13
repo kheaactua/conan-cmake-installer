@@ -15,6 +15,9 @@ class CmakeinstallerConan(ConanFile):
     settings    = 'os', 'compiler', 'build_type', 'arch'
     requires    = 'helpers/0.3@ntc/stable'
 
+    def minor_version(self):
+        return ".".join(str(self.cmake_version).split(".")[:2])
+
     def system_requirements(self):
         pack_names = None
         if tools.os_info.linux_distro == 'ubuntu':
@@ -52,7 +55,13 @@ class CmakeinstallerConan(ConanFile):
             autotools.make(target='install')
 
     def package_info(self):
-        self.env_info.path.append(os.path.join(self.package_folder, 'bin'))
-        self.env_info.path.append(os.path.join(self.package_folder, 'share/aclocal'))
+        if self.package_folder is not None:
+            minor = self.minor_version()
+            self.env_info.path.append(os.path.join(self.package_folder, "bin"))
+            self.env_info.CMAKE_ROOT = self.package_folder
+            mod_path = os.path.join(self.package_folder, "share", "cmake-%s" % minor, "Modules")
+            self.env_info.CMAKE_MODULE_PATH = mod_path
+            if not os.path.exists(mod_path):
+                raise Exception("Module path not found: %s" % mod_path)
 
 # vim: ts=4 sw=4 expandtab ffs=unix ft=python foldmethod=marker :
